@@ -9,7 +9,7 @@
 3. Install pip
 4. Get this code
 5. Create and enter your virtualenv `virtualenv slack` then `. ./slack/bin/activate`
-6. Run `pip install -r requirements`
+6. Run `pip install -r requirements.txt`
 7. Get a Slack API key (For EEN people I have a Slack account StashPop set up - get the key from me)
 8. Put the key in the `chomps.py` file
 9. Run `python chomps/chomps.py`
