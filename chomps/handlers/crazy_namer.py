@@ -6,7 +6,7 @@ import re
 import random
 import requests
 import simplejson
-from base import BotHandler
+from lib import ChompsHandler
 
 
 # Crazy namer scripts
@@ -52,7 +52,7 @@ def execute_script(script):
 # define what you wanna trigger on and what you want matched in groups.
 trigger = re.compile('(?:[Cc]homps) (name|say)(?:\s|$)?([0-9a-zA-Z]*)')
 
-class NameIt(BotHandler):    
+class NameIt(ChompsHandler):    
     @property
     def pattern(self):
         """This is called by the chomps engine to get the pattern for the function"""
@@ -71,7 +71,7 @@ class NameIt(BotHandler):
     def process_message(self, match, msg):
         command = match.groups()[0] if match.groups()[0] else None
         entity = match.groups()[1] if match.groups()[1] else 'random'
-        return "*{}* _ (www.crazynamer.com)_".format(name)
+        return "*{}* _ (www.crazynamer.com)_".format(self.get_name(entity))
 
 
 
