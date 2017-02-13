@@ -4,7 +4,7 @@ import random
 import requests
 import simplejson
 from pprint import pprint
-from base import BotHandler
+from lib import ChompsHandler
 
 
 ##### This is where the part starts - The BotHandler ####
@@ -14,7 +14,7 @@ from base import BotHandler
 # define what you wanna trigger on and what you want matched in groups.
 trigger = re.compile('chomps marco')
 
-class MyHandler(BotHandler):    
+class MyHandler(ChompsHandler):    
     @property
     def pattern(self):
         """This is called by the chomps engine to get the pattern for the function"""

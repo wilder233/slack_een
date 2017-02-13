@@ -11,24 +11,22 @@ import re
 import time
 import traceback
 from pprint import pprint, pformat
-from handlers.crazy_namer import NameIt
-from handlers.my_handler import MyHandler
 from slackclient import SlackClient
+from lib import HandlerRegistry
 
 
 BOT_NAME = 'chomps'
-BOT_ID = "RUN utils/bot_id.py to get this" #StashPop
-
-SLACK_BOT_TOKEN="GetYourOwnToken"  #StashPop Slack
-READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
-
+BOT_ID = "U1N0ZPN1F" #StashPop
+SLACK_BOT_TOKEN="xoxb-56033804049-HXLqAoWY5xEZc51i3WvrUEI5"  #StashPop Slack
 slack_client = SlackClient(SLACK_BOT_TOKEN)
 
-new_handlers = [
-    NameIt(slack_client, BOT_NAME, BOT_ID),
-    MyHandler(slack_client, BOT_NAME, BOT_ID),
-]
+READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
 
+# Load the plugins
+pwd = os.path.dirname(os.path.abspath(__file__))
+plugin_dir = os.path.join(pwd, "handlers")
+handlers = HandlerRegistry([plugin_dir], slack_client, BOT_NAME, BOT_ID)
+handlers.load_plugins()
 
 def simple_response(response, channel):
     slack_client.api_call("chat.postMessage", channel=channel, text=response, as_user=True)
@@ -47,7 +45,6 @@ if __name__ == "__main__":
             rtm = slack_client.rtm_read()
             if rtm and len(rtm) > 0:
                 try:
-
                     # For each message read - do the NEW HANDLERS
                     for msg in rtm:
                         # Do not respond to message from ourselves
@@ -57,7 +54,7 @@ if __name__ == "__main__":
                         text = msg.get('text', '')
                         if text:
                             print "CHANNEL: {} => Message: {}".format(msg['channel'], text.encode('ascii', 'ignore'))
-                            for handler in new_handlers:
+                            for handler in handlers:
                                 count = 0
                                 for match in handler.pattern.finditer(text):
                                     count += 1
