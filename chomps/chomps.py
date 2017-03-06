@@ -14,10 +14,17 @@ from pprint import pprint, pformat
 from slackclient import SlackClient
 from lib import HandlerRegistry
 
+################################################################################
+# Setup a new bot in your slack
+# https://<your_slack>.slack.com/apps/manage/custom-integrations
+################################################################################
 
-BOT_NAME = 'chomps'
-BOT_ID = "U1N0ZPN1F" #StashPop
-SLACK_BOT_TOKEN="xoxb-56033804049-HXLqAoWY5xEZc51i3WvrUEI5"  #StashPop Slack
+# @name of bot if you see @chomps online in your config put 'chomps' here
+BOT_NAME        = 'chomps'
+# Bot ID         **Note: do not publish this (we advise making this an ENV and populating this with os.environ.get(<ENV_NAME>, "")
+BOT_ID          = ""
+# Bot API Token  **Note: do not publish this (we advise making this an ENV and populating this with os.environ.get(<ENV_NAME>, "")
+SLACK_BOT_TOKEN = ""
 slack_client = SlackClient(SLACK_BOT_TOKEN)
 
 READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
@@ -37,10 +44,8 @@ def handle(handler, match, msg):
         simple_response(response, msg['channel'])
 
 if __name__ == "__main__":
-    
     if slack_client.rtm_connect():
         print("Chomps: connected and running!")
-        
         while True:
             rtm = slack_client.rtm_read()
             if rtm and len(rtm) > 0:
@@ -60,11 +65,9 @@ if __name__ == "__main__":
                                     count += 1
                                     if count <= handler.call_limit:
                                         #gevent.spawn(handle, handler, match, msg)
-                                        
                                         response = handler.process_message(match, msg)
                                         if response:
                                             simple_response(response, msg['channel'])
-                                        
                                     else:
                                         break
 
@@ -75,4 +78,3 @@ if __name__ == "__main__":
             time.sleep(READ_WEBSOCKET_DELAY)
     else:
         print("Connection failed. Invalid Slack token or bot ID?")
-    
