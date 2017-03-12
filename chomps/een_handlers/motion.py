@@ -94,9 +94,7 @@ class MotionHandler(ChompsHandler):
         """ Callback method for processing Iris Events """
         log.info("Handling Event {}".format(event.name))
         log.info("Event {}: image: {}".format(event.name, event.image.status_code))
-        pprint(event.cam_info)
-        pprint(event.data)
-
+        
         if self.controller.handle_event(event):
             self.send_event(event)
         else:
@@ -111,7 +109,7 @@ class MotionHandler(ChompsHandler):
         if not devices:
             gevent.spawn_later(10, self.check_devices)
         else:
-            gevent.spawn_later(10, self.check_devices)
+            gevent.spawn_later(600, self.check_devices)
 
     def send_event(self, event):
         esn = event.cam_id
