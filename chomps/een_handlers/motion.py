@@ -22,16 +22,18 @@ een_icon_url = "https://s3-us-west-2.amazonaws.com/slack-files2/avatars/2015-11-
 def make_event_attachment(event, upload, region, intel):
     title = "{} on {}".format(event.name, event.cam_info['name'])
 
-    general = intel.top_tags['general-v1.3']
+    general = intel.general_description or "nothing of interest"
+    color = "#1aaf51" if not intel.general_description else "#9b0711"
+    
     custom = ""
     if region.model:
         custom = intel.top_tags[region.model]
 
     ach = dict(
         fallback=title,
-        color="#9b0711",
+        color=color,
         title=title,
-        text="_Looks like {} is on the {}_".format(general, event.cam_info['name']),
+        text="_Looks like {} on the {}_".format(general, event.cam_info['name']),
         image_url=upload['permalink'],
         thumb_url=een_icon_url,
         footer_icon=een_icon_url,
@@ -42,10 +44,9 @@ def make_event_attachment(event, upload, region, intel):
     ach['actions'] = []
 
     # Intel
-    if region.model:
+    if intel.custom_description:
         intel = dict(
-            title="Customized Analysis",
-            value="_{}_".format(custom),
+            value="_*{}*_".format(intel.custom_description),
             short=False,
         )
         ach['fields'].append(intel)
