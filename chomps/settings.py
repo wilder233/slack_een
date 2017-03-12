@@ -13,6 +13,10 @@ EEN_CAM_IDS = os.environ.get('EEN_CAM_IDS', "").split(',')
 EEN_ALERT_RESET = int(os.environ.get('EEN_ALERT_RESET', 90))
 EEN_ALERT_REGION = os.environ.get('EEN_ALERT_REGION', 'op_boomstick')
 
+CLARIFAI_SECRET = os.environ.get('CLARIFAI_SECRET')
+CLARIFAI_APP_ID = os.environ.get('CLARIFAI_APP_ID')
+CUSTOM_MODEL = os.environ.get('CUSTOM_MODEL')
+
 __LOG_FORMAT = os.environ.get('EEN_LOG_FORMAT', '%(asctime)s.%(msecs).03d[%(levelname)0.3s] %(name)s:%(funcName)s.%(lineno)d %(message)s')
 __DATE_FORMAT = os.environ.get('EEN_LOG_DATE_FORMAT', '%m-%d %H:%M:%S')
 LOGGING = {

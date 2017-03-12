@@ -19,14 +19,19 @@ log = logging.getLogger("chomps.iris")
 BOT_NAME = "Iris for Eagle Eye"
 een_icon_url = "https://s3-us-west-2.amazonaws.com/slack-files2/avatars/2015-11-02/13720654866_55504da4bb6fdb6dfa35_68.jpg"
 
-def make_event_attachment(event, upload, intel):
+def make_event_attachment(event, upload, region, intel):
     title = "{} on {}".format(event.name, event.cam_info['name'])
+
+    general = intel.top_tags['general-v1.3']
+    custom = ""
+    if region.model:
+        custom = intel.top_tags[region.model]
 
     ach = dict(
         fallback=title,
         color="#9b0711",
         title=title,
-        text="_--Intel Not Available --_",
+        text="_Looks like {} is on the {}_".format(general, event.cam_info['name']),
         image_url=upload['permalink'],
         thumb_url=een_icon_url,
         footer_icon=een_icon_url,
@@ -37,12 +42,13 @@ def make_event_attachment(event, upload, intel):
     ach['actions'] = []
 
     # Intel
-    intel = dict(
-        title="Intel",
-        value="_Intel Not Available Yet_",
-        short=False,
-    )
-    ach['fields'].append(intel)
+    if region.model:
+        intel = dict(
+            title="Customized Analysis",
+            value="_{}_".format(custom),
+            short=False,
+        )
+        ach['fields'].append(intel)
 
     ach['actions'].append({
         'name': "Train",
@@ -69,7 +75,12 @@ class MotionHandler(ChompsHandler):
         #self.notif_channel = "#general"
         #self.send_notification(">>>Iris is running")
 
-        self.controller = NotificationManager(settings.EEN_ALERT_RESET, settings.EEN_ALERT_REGION)
+        self.controller = NotificationManager(
+            settings.EEN_ALERT_RESET, 
+            settings.EEN_ALERT_REGION,
+            settings.CUSTOM_MODEL
+        )
+        self.clarifai = ImageClassifier(settings.CLARIFAI_APP_ID, settings.CLARIFAI_SECRET)
 
         # Start the Iris event watcher
         self.event_monitor = EventMonitor(
@@ -92,11 +103,12 @@ class MotionHandler(ChompsHandler):
     
     def handle_image_event(self, event):
         """ Callback method for processing Iris Events """
-        log.info("Handling Event {}".format(event.name))
         log.info("Event {}: image: {}".format(event.name, event.image.status_code))
         
-        if self.controller.handle_event(event):
-            self.send_event(event)
+        classify_region = self.controller.handle_event(event)
+        if classify_region:
+            intel = self.clarifai.intel_report(event.image.content, classify_region)
+            self.send_event(event, classify_region, intel)
         else:
             log.info("SKIPPING EVENT")
         #self.send_notification(">>> :gear: Handling Event {} for {}".format(event.name, event.cam_id))
@@ -111,20 +123,21 @@ class MotionHandler(ChompsHandler):
         else:
             gevent.spawn_later(600, self.check_devices)
 
-    def send_event(self, event):
+    def send_event(self, event, region, intel):
         esn = event.cam_id
         filename = "{}_{}.jpg".format(esn, event.image.headers['x-ee-timestamp'])
         log.info("Uploading file {}".format(filename))
 
         _resp = self.client.api_call(
             'files.upload',
-            file=StringIO.StringIO(event.image.content),
+            #file=StringIO.StringIO(event.image.content),
+            file=StringIO.StringIO(intel.tag_region),
             filename=filename,
             channels="#general"
         )
 
         log.info("File URL is {}".format(_resp['file']['permalink']))
-        attachment = make_event_attachment(event, _resp['file'], None)
+        attachment = make_event_attachment(event, _resp['file'], region, intel)
         self.client.api_call(
             "chat.postMessage", 
             icon_url=een_icon_url,
