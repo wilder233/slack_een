@@ -22,7 +22,7 @@ een_icon_url = "https://s3-us-west-2.amazonaws.com/slack-files2/avatars/2015-11-
 def make_event_attachment(event, upload, region, intel):
     title = "{} on {}".format(event.name, event.cam_info['name'])
 
-    general = intel.general_description or "nothing of interest"
+    general = intel.general_concepts['caption'] or "nothing of interest"
     color = "#1aaf51" if not intel.general_description else "#9b0711"
     
     custom = ""
@@ -100,7 +100,9 @@ class MotionHandler(ChompsHandler):
 
     def process_message(self, match, message):
         """ Listen for Iris commands """
-        return self.send_notification('>>>At your service - "{}"'.format(match.groups()[0]), message['channel'])
+        
+        sentence = match.groups()[0]
+        return self.send_notification('>>>At your service - "{}"'.format(sentence), message['channel'])
     
     def handle_image_event(self, event):
         """ Callback method for processing Iris Events """
