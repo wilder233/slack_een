@@ -23,7 +23,7 @@ def make_event_attachment(event, upload, region, intel):
     title = "{} on {}".format(event.name, event.cam_info['name'])
 
     general = intel.general_concepts['caption'] or "nothing of interest"
-    color = "#1aaf51" if not intel.general_description else "#9b0711"
+    color = "#1aaf51" if not intel.general_concepts['caption'] else "#9b0711"
     
     custom = ""
     if region.model:
