@@ -26,7 +26,7 @@ def make_event_attachment(event, upload, region, intel, withdebug=False):
     color = "#1aaf51" if not intel.general_concepts['caption'] else "#eaaa20"
     
     # color the attachment red for these
-    for concept in [intel.tm.gun, intel.tm.danger, intel.tm.pistol, intel.tm.box, intel.pm.bag, intel.tm.crate, intel.tm.equipment, intel.tm.container]:
+    for concept in [intel.tm.gun, intel.tm.danger, intel.tm.pistol, intel.tm.box, intel.tm.bag, intel.tm.crate, intel.tm.equipment, intel.tm.container]:
         if concept > 85:
             color = "#9b0711"
             break
