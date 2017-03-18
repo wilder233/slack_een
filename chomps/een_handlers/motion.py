@@ -57,6 +57,13 @@ def make_event_attachment(event, upload, region, intel, withdebug=False):
         )
         ach['fields'].append(field)
 
+    if intel.general_concepts['outfit']:
+        field = dict(
+            title="Wearing (alpha)",
+            value="_{}_".format(intel.general_concepts['outfit']),
+            short=False,
+        )
+        ach['fields'].append(field)
 
     ### SHOW DEBUG TAG
     if withdebug:
@@ -153,7 +160,7 @@ class MotionHandler(ChompsHandler):
             'files.upload',
             file=StringIO.StringIO(event.image.content),
             filename=filename,
-            channels="#general"
+            channels=settings.SLACK_OPEN_CHANNEL
         )
 
         attachment = make_event_attachment(event, _resp['file'], region, intel)
@@ -166,11 +173,12 @@ class MotionHandler(ChompsHandler):
             attachments=simplejson.dumps([attachment])
         )
         if settings.SHOW_TAGS:
+            # Dump the attachment with debug info AND the cropped region used for tagging
             attachment = make_event_attachment(event, _resp['file'], region, intel, True)
             self.client.api_call(
                 "chat.postMessage", 
                 icon_url=een_icon_url,
-                channel="#iris_debug", 
+                channel=settings.SLACK_DEBUG_CHANNEL, 
                 as_user=False,
                 username=BOT_NAME,
                 attachments=simplejson.dumps([attachment])
@@ -179,9 +187,9 @@ class MotionHandler(ChompsHandler):
                 'files.upload',
                 file=StringIO.StringIO(intel.tag_region),
                 filename="crop-{}".format(filename),
-                channels="#iris_debug"
+                channels=settings.SLACK_DEBUG_CHANNEL, 
             )
-        
+            
 
     def send_notification(self, message, channel=None):
         self.client.api_call(
