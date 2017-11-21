@@ -16,8 +16,8 @@ from lib import HandlerRegistry
 
 
 BOT_NAME = 'chomps'
-BOT_ID = "U1N0ZPN1F" #StashPop
-SLACK_BOT_TOKEN="xoxb-56033804049-HXLqAoWY5xEZc51i3WvrUEI5"  #StashPop Slack
+BOT_ID = os.environ.get("EEN_SLACKBOT_ID", "U1N0ZPN1F") #StashPop
+SLACK_BOT_TOKEN = os.environ.get("EEN_SLACK_API_KEY", "xoxb-56033804049-HXLqAoWY5xEZc51i3WvrUEI5")  #StashPop Slack
 slack_client = SlackClient(SLACK_BOT_TOKEN)
 
 READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
