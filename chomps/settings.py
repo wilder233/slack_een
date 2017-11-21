@@ -18,7 +18,7 @@ EEN_ALERT_REGION = os.environ.get('EEN_ALERT_REGION', 'op_boomstick')
 CLARIFAI_SECRET = os.environ.get('CLARIFAI_SECRET')
 CLARIFAI_APP_ID = os.environ.get('CLARIFAI_APP_ID')
 CUSTOM_MODEL = os.environ.get('CUSTOM_MODEL')
-#CUSTOM_MODEL = None
+CUSTOM_MODEL = None
 SHOW_TAGS = os.environ.get('SHOW_TAGS') == 'True'
 
 
